@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Users {
+    userId    Int      @id @default(autoincrement()) @map("userId")
+    nickname  String   @map("nickname") // 유저닉네임설정
+    id        String   @unique @map("id") // 로그인에필요한 아이디
+    password  String   @map("password")
+    cash      Int      @map("cash")
+
+    winCount    Int   @default(0) @map("winCount")
+    looseCount  Int   @default(0) @map("loosecCount")
+    rating      Int   @default(1000) @map("rating")
+
+    createdAt DateTime @default(now()) @map("createdAt")
+
+
+    Team    Team[]
+
+  
+    @@map("Users")
+  }
+
+  model TeamInternal {
+    teamInternalId    Int      @id @default(autoincrement()) @map("TeamInternalId")
+    teamId            Int      @map("teamId")
+    userId            Int      @map("userId")
+    playerId          Int      @map("playerId")
+
+    createdAt DateTime @default(now()) @map("createdAt")
+    updatedAt DateTime @updatedAt @map("updatedAt")
+
+    Team    Team    @relation(fields: [teamId], references: [teamId])
+  
+    @@map("TeamInternal")
+  }
+
+  model Team {
+    teamId          Int      @id @default(autoincrement()) @map("TeamId")
+    userId          Int      @map("userId")
+    teamInternalId  Int      @map("TeamInternalId")
+    playerListId    Int      @map("PlayerListId")
+
+    createdAt DateTime @default(now()) @map("createdAt")
+    updatedAt DateTime @updatedAt @map("updatedAt")
+
+    TeamInternal    TeamInternal[]
+    PlayerWaitingList   PlayerWaitingList[]
+    users    Users    @relation(fields: [userId], references: [userId])
+  
+    @@map("Team")
+  }
+
+  model PlayerWaitingList {
+    playerListId    Int      @id @default(autoincrement()) @map("PlayerListId")
+    teamId          Int      @map("teamId")
+    userId          Int      @map("userId")
+    playerId        Int      @map("playerId")
+    playerName      String   @map("playerName")
+    count           Int      @map("count")
+
+    createdAt DateTime @default(now()) @map("createdAt")
+    updatedAt DateTime @updatedAt @map("updatedAt")
+
+    Team    Team    @relation(fields: [teamId], references: [teamId])
+  
+    @@map("PlayerWaitingList")
+  }
+
+  model Player {
+    playerId         Int      @id @default(autoincrement()) @map("playerId")
+    name             String   @unique @map("name")
+    speed            Int      @map("speed")
+    goalDecisiveness Int      @map("goalDecisiveness")
+    shootPower       Int      @map("shootPower")
+    defense          Int      @map("defense")
+    stamina          Int      @map("stamina")
+    tier             String   @map("tier")
+
+    createdAt DateTime @default(now()) @map("createdAt")
+    updatedAt DateTime @updatedAt @map("updatedAt")
+
+  
+  
+    @@map("Player")
+  }
