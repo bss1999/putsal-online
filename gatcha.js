@@ -90,7 +90,7 @@ router.post("/gatcha", authMiddleware, async (req, res, next) => {
         // 트랜잭션 내부에서 선수 보유 카운트 +1 업데이트
         await tx.PlayerWaitingList.update({
           where: {
-            PlayerListId: IsExistplayer.playerListId,
+            playerListId: IsExistplayer.playerListId,
             userId: userId.userId,
             playerId: pickPlayer.playerId,
           },
