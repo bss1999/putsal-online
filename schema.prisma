@@ -22,6 +22,7 @@ model Users {
     cash      Int      @map("cash")
 
     winCount    Int   @default(0) @map("winCount")
+    drawCount   Int   @default(0) @map("drawCount")
     looseCount  Int   @default(0) @map("loosecCount")
     rating      Int   @default(1000) @map("rating")
 
@@ -65,17 +66,23 @@ model Users {
   }
 
   model PlayerWaitingList {
-    playerListId    Int      @id @default(autoincrement()) @map("PlayerListId")
-    teamId          Int      @map("teamId")
-    userId          Int      @map("userId")
-    playerId        Int      @map("playerId")
-    playerName      String   @map("playerName")
-    count           Int      @map("count")
+    playerListId      Int      @id @default(autoincrement()) @map("PlayerListId")
+    teamId            Int?      @map("teamId")
+    userId            Int      @map("userId")
+    playerId          Int      @map("playerId")
+    playerName        String   @map("playerName")
+    speed             Int      @map("speed")  //강화를 위한 스탯 삽입
+    goalDecisiveness  Int      @map("goalDecisiveness") //강화를 위한 스탯 삽입
+    shootPower        Int      @map("shootPower") //강화를 위한 스탯 삽입
+    defense           Int      @map("defense")  //강화를 위한 스탯 삽입
+    stamina           Int      @map("stamina")  //강화를 위한 스탯 삽입
+    count             Int      @map("count") //보유숫자
+    force             Int      @default(1) @map("force") //강화수치
 
     createdAt DateTime @default(now()) @map("createdAt")
     updatedAt DateTime @updatedAt @map("updatedAt")
 
-    Team    Team    @relation(fields: [teamId], references: [teamId])
+    Team    Team?    @relation(fields: [teamId], references: [teamId])
   
     @@map("PlayerWaitingList")
   }
