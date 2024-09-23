@@ -45,7 +45,7 @@ router.post("/gatcha", authMiddleware, async (req, res, next) => {
     }
 
     //해당 티어에 해당되는 선수들의 목록을 불러옴
-    const tierplayers = await prisma.player.findMany({
+    const tierPlayers = await prisma.player.findMany({
       where: {
         tier: tier,
       },
@@ -62,14 +62,14 @@ router.post("/gatcha", authMiddleware, async (req, res, next) => {
     });
 
     //불러온 목록에서 랜덤으로 한 선수를 최종적으로 뽑음
-    const pick_player =
-      tierplayers[Math.floor(Math.random() * tierplayers.length)];
+    const pickPlayer =
+    tierPlayers[Math.floor(Math.random() * tierPlayers.length)];
 
     //해당 선수를 이미 보유하고있는지 찾음
     const IsExistplayer = await prisma.playerWaitingList.findFirst({
       where: {
         userId: userId.userId,
-        playerId: pick_player.playerId,
+        playerId: pickPlayer.playerId,
       },
     });
 
@@ -90,9 +90,9 @@ router.post("/gatcha", authMiddleware, async (req, res, next) => {
         // 트랜잭션 내부에서 선수 보유 카운트 +1 업데이트
         await tx.PlayerWaitingList.update({
           where: {
-            PlayerListId: IsExistplayer.PlayerListId,
+            PlayerListId: IsExistplayer.playerListId,
             userId: userId.userId,
-            playerId: pick_player.playerId,
+            playerId: pickPlayer.playerId,
           },
           data: {
             count: { increment: 1 },
@@ -102,7 +102,7 @@ router.post("/gatcha", authMiddleware, async (req, res, next) => {
 
       return res.status(201).json({
         message: `${tier}등급을 뽑았습니다! 이미 보유하고있는 선수이므로 보유숫자가 늘어납니다.`,
-        data: pick_player,
+        data: pickPlayer,
       });
     }
 
@@ -122,7 +122,13 @@ router.post("/gatcha", authMiddleware, async (req, res, next) => {
       await tx.PlayerWaitingList.create({
         data: {
           userId: userId.userId,
-          playerId: pick_player.playerId,
+          playerId: pickPlayer.playerId,
+          playerName: pickPlayer.name,
+          speed : pickPlayer.speed,
+          goalDecisiveness : pickPlayer.goalDecisiveness,
+          shootPower : pickPlayer.shootPower,
+          defense : pickPlayer.defense,
+          stamina : pickPlayer.stamina,
           count: 1,
         },
       });
@@ -130,7 +136,7 @@ router.post("/gatcha", authMiddleware, async (req, res, next) => {
 
     return res.status(201).json({
       message: `${tier}등급을 뽑았습니다!`,
-      data: pick_player,
+      data: pickPlayer,
     });
   } catch (err) {
     next(err);
@@ -143,7 +149,7 @@ router.get('/list', authMiddleware, async (req, res, next) => {
     //정보 전달받음
       const userId = req.user
       
-      const user = await prisma.PlayerWaitingList.findMany({
+      const user = await prisma.playerWaitingList.findMany({
           where: {
               userId: userId.userId,
             },
